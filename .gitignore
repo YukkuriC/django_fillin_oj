@@ -1,9 +1,13 @@
+# 后缀
 *.pyc
-.env
+*.db
+*.lnk
+
+# 单文件
 setup.json
+
+# 目录
 /_STORAGE
 /.vscode
 */migrations
-*.db
-.apache_files
-*.lnk
+/.apache_files
