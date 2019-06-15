@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div id='header' class="row header bg-info">
+        {% block header %}
+        <div class='col-sm-12'>
+            <h1><a>{% block title %}{% endblock %}</a></h1>
+        </div>
+        {% endblock %}
+    </div>
+    <!-- Body -->
+    <div id='body' style='margin-bottom:15px'>
+        {% block body %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

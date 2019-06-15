@@ -1,0 +1,22 @@
+{% extends 'form_base.html' %}
+{% load staticfiles %}
+
+{% block title %}{{code}} - {{title}}{% endblock %}
+
+{% block body %}
+<div class='x_block'>
+    <ul>
+        {% for line in text %}
+        <li>{{line}}</li>
+        {% endfor %}
+    </ul>
+</div>
+<div class='row' style='margin-top:15px'>
+    <div class='col-6'>
+        <a href="/home/" class='btn btn-primary form-control' role="button">返回首页</a>
+    </div>
+    <div class='col-6'>
+        <button class='btn btn-primary form-control' onclick='history.back(-1)'>返回上页</button>
+    </div>
+</div>
+{% endblock %}

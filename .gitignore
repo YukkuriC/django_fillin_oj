@@ -1,0 +1,9 @@
+*.pyc
+.env
+setup.json
+/_STORAGE
+/.vscode
+*/migrations
+*.db
+.apache_files
+*.lnk

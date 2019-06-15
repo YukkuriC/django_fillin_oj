@@ -1,0 +1,35 @@
+{% extends 'layout0.html' %}
+{% load staticfiles %}
+
+{% block css%}
+<style>
+    .container {
+        width: 28em;
+        min-width: 300px;
+        margin-top: 100px;
+    }
+
+    #body {
+        padding-top: 20px
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<form method="post" row='form' enctype="multipart/form-data">
+    {% csrf_token %}
+    {% block form_override %}
+    {%for elem in form%}
+    <div class="form-group">
+        {% include "sub/form_element.html" %}
+    </div>
+    {%endfor%}
+    <div class="form-group">
+        <input type="submit" value="{% block submit_button %}{% endblock %}" class='btn btn-primary form-control'>
+    </div>
+    {% endblock %}
+</form>
+<div class="form-group">
+    {% block footer %}{% endblock %}
+</div>
+{% endblock %}
