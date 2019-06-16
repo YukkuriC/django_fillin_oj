@@ -130,17 +130,14 @@
                     </li>
                 </ul>
             </div>
-            <div class="col-sm-2">
-                <button id='preview_problem' class='btn btn-info form-control'>预览</button>
-            </div>
-            <!-- <div class="col-sm-2 dropdown">
+            <div class="col-sm-2 dropdown">
                 <a href="#" class="btn btn-secondary form-control dropdown-toggle" data-toggle="dropdown">设置</a>
                 <ul class="dropdown-menu">
                     <li>
                         <button id='codemirror_linewrap' class='btn form-control'>自动换行: 开</button>
                     </li>
                 </ul>
-            </div> -->
+            </div>
         </div>
         <br>
         <div class='row'>
@@ -345,9 +342,8 @@
         {
             var preview_code = CodeMirror.fromTextArea(document.getElementById('preview_code'), CODEMIRROR_SETUP);
             var preview_user = CodeMirror.fromTextArea(document.getElementById('preview_user'), CODEMIRROR_SETUP);
-            var opt = (preview_code.options = preview_user.options)
-            opt.indentUnit = 4
-            opt.readOnly = true
+            preview_code.options.indentUnit = preview_user.options.indentUnit = 4
+            preview_code.options.readOnly = preview_user.options.readOnly = true
 
             function preview() {
                 var pool = JSON.parse(json_output.innerText)
@@ -368,7 +364,6 @@
                 preview_user.setValue(tmp2.join('\n'))
             }
         }
-
 
         // 模块与json转换
         {
@@ -407,17 +402,20 @@
             })
         }
 
-        // setting buttons
-        // {
-        //     document.getElementById('codemirror_linewrap').addEventListener('click', e => {
-        //         var self = e.path[0]
-        //         e.stopPropagation();
-        //         editor.setOption('lineWrapping', !editor.getOption('lineWrapping'))
-        //         self.innerHTML = '自动换行: '
-        //         if (editor.getOption('lineWrapping')) self.innerHTML += '开'
-        //         else self.innerHTML += '关'
-        //     })
-        // }
+        // 批量切换自动换行
+        {
+            document.getElementById('codemirror_linewrap').addEventListener('click', function (e) {
+                var self = e.path[0]
+                e.stopPropagation();
+                var tmp = (CODEMIRROR_SETUP.lineWrapping = !CODEMIRROR_SETUP.lineWrapping)
+                module_pool.forEach(function (mod) {
+                    mod.mirror.setOption('lineWrapping', tmp)
+                })
+                preview_user.setOption('lineWrapping', tmp)
+                preview_code.setOption('lineWrapping', tmp)
+                self.innerHTML = '自动换行: ' + (tmp ? '开' : '关')
+            })
+        }
     </script>
 </body>
 
