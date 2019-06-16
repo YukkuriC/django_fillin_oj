@@ -1,0 +1,431 @@
+<html>
+
+<head>
+    <title>PyFillin出题机</title>
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <!-- codemirror -->
+
+    <!-- codemirror base -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/codemirror/5.44.0/codemirror.min.css" />
+    <script src="https://cdn.bootcss.com/codemirror/5.44.0/codemirror.min.js"></script>
+
+    <!-- codemirror python -->
+    <script src="https://cdn.bootcss.com/codemirror/5.44.0/mode/python/python.min.js"></script>
+
+    <!-- 代码折叠 -->
+    <script src="https://cdn.bootcss.com/codemirror/5.44.0/addon/fold/indent-fold.js"></script>
+    <script src="https://cdn.bootcss.com/codemirror/5.44.0/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdn.bootcss.com/codemirror/5.44.0/addon/fold/foldgutter.min.js"></script>
+    <link href="https://cdn.bootcss.com/codemirror/5.44.0/addon/fold/foldgutter.min.css" rel="stylesheet">
+
+    <!-- 括号 -->
+    <script src="https://cdn.bootcss.com/codemirror/5.44.0/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdn.bootcss.com/codemirror/5.44.0/addon/edit/matchbrackets.min.js"></script>
+
+    <!-- sublime快捷键 -->
+    <script src="https://cdn.bootcss.com/codemirror/5.44.0/addon/comment/comment.min.js"></script>
+    <script src="https://cdn.bootcss.com/codemirror/5.44.0/keymap/sublime.min.js"></script>
+
+    <style>
+        .CodeMirror {
+            height: auto;
+            border: 1px solid #eee;
+            line-height: 1em;
+            font-size: 1em;
+            font-family: "Consolas", 'Courier New', Courier, monospace;
+            padding: 0.2em 0;
+        }
+
+        .CodeMirror-scroll {
+            height: auto;
+            overflow-y: hidden;
+            overflow-x: auto;
+        }
+
+        textarea {
+            width: 100%;
+            height: 40em
+        }
+
+        .smooth {
+            transition: 0.3s all;
+            overflow: hidden
+        }
+
+        .module {
+            padding: 5px 0px;
+        }
+
+        .module:hover>.toolbar {
+            max-height: 30px;
+            opacity: 1;
+        }
+
+        .toolbar {
+            font-size: 0.5em;
+            opacity: 0;
+            max-height: 0px;
+            transition: 0.3s all;
+            overflow: hidden;
+        }
+
+        #json_output {
+            overflow-y: auto;
+            overflow-x: hidden;
+            white-space: pre-wrap;
+            max-height: 40em;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+    </style>
+
+</head>
+
+<body style='background: #eee'>
+    <div class='container' style='background: white'>
+        <div class='row' style='background-color: var(--dark); height:40px'>
+            <div class='col-sm-12'>
+                <a class="navbar-brand" href="https://github.com/YukkuriC/django_fillin_oj" target='_blank'>
+                    <span style='color:#4585b5'>Py</span><span style='color:#ffd545'>Fillin</span>
+                    <span style='color:white'>OJ 出题工具</span>
+                </a>
+            </div>
+        </div>
+        <br>
+        <div class='row'>
+            <div class="col-sm-2 dropdown">
+                <a href="#" class="btn btn-secondary form-control dropdown-toggle" data-toggle="dropdown">插入</a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button id='add_struct' class='btn form-control'>插入给定代码块</button>
+                    </li>
+                    <li>
+                        <button id='add_fillin' class='btn form-control'>插入填空块</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-sm-2 dropdown">
+                <a href="#" class="btn btn-secondary form-control dropdown-toggle" data-toggle="dropdown">转换</a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button id='module_to_json' class='btn form-control'>模块输出为JSON</button>
+                    </li>
+                    <li>
+                        <button id='json_to_module' class='btn form-control'>JSON读取为模块</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-sm-2 dropdown">
+                <a href="#" class="btn btn-secondary form-control dropdown-toggle" data-toggle="dropdown">文件</a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button id='load_code' class='btn form-control'>读取</button>
+                    </li>
+                    <li>
+                        <button id='save_code' class='btn form-control'>保存</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-sm-2 dropdown">
+                <a href="#" class="btn btn-secondary form-control dropdown-toggle" data-toggle="dropdown">设置</a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button id='codemirror_linewrap' class='btn form-control'>自动换行: 开</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <br>
+        <div class='row'>
+            <div class='col-sm-6 smooth'>
+                <h3>代码区域</h3>
+                <div id="module_pool"></div>
+            </div>
+            <div class='col-sm-6 smooth'>
+                <h3>JSON输出</h3>
+                <pre id="json_output" contenteditable></pre>
+            </div>
+        </div>
+        <br>
+    </div>
+
+    <div class='container' style='background: white; margin-top: 20px;'>
+        <div class='row'>
+            <div class='col-sm-6'>
+                <h3>组装代码</h3>
+                <textarea id='preview_code' style="display:none"></textarea>
+            </div>
+            <div class='col-sm-6'>
+                <h3>用户端显示</h3>
+                <textarea id='preview_user' style="display:none"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- 各种功能辅助 -->
+    <div id='escape_helper' style="display:none"></div><!--  -->
+    <input type="file" id='upload_helper' style="display:none">
+    <a id='save_helper' style="display:none"></a>
+
+    <!-- 全局DOM -->
+    <script>
+        upload_helper = document.getElementById('upload_helper')
+        save_helper = document.getElementById('save_helper')
+        module_pool = document.getElementById('module_pool')
+        json_output = document.getElementById('json_output')
+        module_pool.forEach = function (fun) {
+            data = module_pool.children
+            for (var i = 0; i < data.length; i++) {
+                fun(data[i], i, data)
+            }
+            console.log('foreach end')
+        }
+    </script>
+
+    <!-- CodeMirror配置 -->
+    <script>
+        // codemirror
+        function newTab(cm) {
+            if (cm.somethingSelected()) {
+                cm.indentSelection('add');
+            } else {
+                var tab_value = cm.getOption("indentWithTabs") ? "\t" : Array(cm.getOption("indentUnit") + 1).join(" ")
+                cm.replaceSelection(tab_value, "end", "+input")
+            }
+        }
+        CODEMIRROR_SETUP = {
+            mode: "python",
+            indentUnit: 2,
+            indentWithTabs: true,
+            lineWrapping: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            keyMap: 'sublime',
+            extraKeys: { Tab: newTab },
+        }
+    </script>
+
+    <!-- 代码模块 -->
+    <script>
+        // 给定块
+        function add_block(type, obj = null) {
+            var pool = document.createElement('div')
+            pool.className = 'col-sm-12 module'
+
+            // 属性
+            {
+                pool.type = type
+                if (type == 0) {
+                    pool.show = obj ? obj.s : true
+                    pool.edit_display = false
+                    pool.text_cache = obj ? (obj.d || '') : ''
+                }
+            }
+
+            // 工具栏
+            var toolbar = document.createElement('div')
+            toolbar.className = 'toolbar'
+            var toolbar_left = document.createElement('div')
+            var toolbar_right = document.createElement('div')
+            toolbar_left.style.display = toolbar_right.style.display = 'inline'
+            toolbar_left.className = 'mr-auto'
+            toolbar_right.className = 'ml-auto'
+            toolbar.appendChild(toolbar_left)
+            toolbar.appendChild(toolbar_right)
+            if (type == 0) {// 代码块
+                {// 设置可见性
+                    var btn_show = document.createElement('button')
+                    btn_show.className = 'btn-xs btn-info'
+                    toolbar.append(btn_show)
+                    btn_show.update = function () {
+                        btn_show.innerHTML = '可见性: ' + (pool.show ? '可见' : '隐藏')
+                    }
+                    btn_show.addEventListener('click', function () {
+                        pool.show = !pool.show
+                        if (pool.show && pool.edit_display) toolbar.btn_mode.click()
+                        btn_show.update()
+                    })
+                    btn_show.update()
+                    toolbar_left.btn_show = btn_show
+                }
+                {// 设置不可见时显示内容
+                    var btn_mode = document.createElement('button')
+                    btn_mode.className = 'btn-xs btn-info'
+                    toolbar.append(btn_mode)
+                    btn_mode.update = function () {
+                        btn_mode.innerHTML = '编辑: ' + (pool.edit_display ? '显示内容' : '代码')
+                    }
+                    btn_mode.addEventListener('click', function () {
+                        if (pool.show && (!pool.edit_display)) return;
+                        pool.edit_display = !pool.edit_display
+                        var tmp = pool.text_cache
+                        pool.text_cache = pool.mirror.getValue()
+                        pool.mirror.setValue(tmp)
+                        btn_mode.update()
+                    })
+                    btn_mode.update()
+                    toolbar_left.btn_mode = btn_mode
+                }
+            }
+            else {// 填空块
+                {// 设置与更新缩进
+                    toolbar_left.innerHTML = '缩进等级: '
+                    var input_indent = document.createElement('input')
+                    input_indent.type = 'number'
+                    input_indent.min = 0
+                    input_indent.max = 10
+                    input_indent.step = 1
+                    input_indent.value = obj ? obj.i : 0
+                    pool.style.paddingLeft = (input_indent.value * CODEMIRROR_SETUP.indentUnit) + 'ch'
+                    input_indent.addEventListener('change', function () {
+                        input_indent.value = Math.max(0, Math.min(10, input_indent.value))
+                        pool.style.paddingLeft = (input_indent.value * CODEMIRROR_SETUP.indentUnit) + 'ch'
+                    })
+                    pool.input_indent = input_indent
+                    toolbar_left.appendChild(input_indent)
+                }
+            }
+            {// 删除块
+                var btn_del = document.createElement('button')
+                btn_del.className = 'btn-xs btn-danger float-right'
+                btn_del.innerHTML = '删除块'
+                btn_del.addEventListener('click', function () {
+                    module_pool.removeChild(pool)
+                })
+                toolbar_right.appendChild(btn_del)
+            }
+            pool.appendChild(toolbar)
+            // codemirror
+            var text = document.createElement('textarea')
+            pool.appendChild(text)
+            pool.mirror = CodeMirror.fromTextArea(text, CODEMIRROR_SETUP);
+            module_pool.appendChild(pool)
+            console.log(type)
+            if (type == 0) {
+                if (obj && obj.c) pool.mirror.setValue(obj.c)
+            } else {
+                pool.mirror.setValue('# 填空区域')
+                pool.mirror.setOption('readOnly', true)
+            }
+        }
+        document.getElementById('add_struct').addEventListener('click', function () { add_block(0) })
+        document.getElementById('add_fillin').addEventListener('click', function () { add_block(1) })
+    </script>
+
+    <!-- 前端按钮 -->
+    <script>
+        // 读取保存JSON
+        {
+            document.getElementById('load_code').addEventListener('click', e => {
+                upload_helper.click()
+            })
+            upload_helper.addEventListener('change', () => {
+                if (!upload_helper.value) return
+                var file_reader = new FileReader()
+                file_reader.addEventListener('load', () => {
+                    json_output.innerText = file_reader.result
+                    document.getElementById('json_to_module').click()
+                })
+                file_reader.readAsText(upload_helper.files[0])
+            })
+            document.getElementById('save_code').addEventListener('click', e => {
+                save_helper.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(json_output.innerText)
+                save_helper.download = 'problem.json'
+                save_helper.click()
+            })
+        }
+
+        // 预览功能
+        {
+            var preview_code = CodeMirror.fromTextArea(document.getElementById('preview_code'), CODEMIRROR_SETUP);
+            var preview_user = CodeMirror.fromTextArea(document.getElementById('preview_user'), CODEMIRROR_SETUP);
+            preview_code.options.indentUnit = preview_user.options.indentUnit = 4
+            preview_code.options.readOnly = preview_user.options.readOnly = true
+
+            function preview() {
+                var pool = JSON.parse(json_output.innerText)
+                var tmp1 = [], tmp2 = []
+                pool.forEach(function (mod_dct) {
+                    if (mod_dct.t == 0) {
+                        tmp1.push(mod_dct.c)
+                        if (mod_dct.s) tmp2.push(mod_dct.c)
+                        else if (mod_dct.d) tmp2.push(mod_dct.d)
+                    }
+                    else {
+                        var text = '\t'.repeat(mod_dct.i) + '### 填空区域 ###'
+                        tmp1.push(text)
+                        tmp2.push(text)
+                    }
+                })
+                preview_code.setValue(tmp1.join('\n'))
+                preview_user.setValue(tmp2.join('\n'))
+            }
+        }
+
+        // 模块与json转换
+        {
+            document.getElementById('module_to_json').addEventListener('click', function () {
+                var res = []
+                module_pool.forEach(function (mod) {
+                    if (typeof mod.mirror == 'undefined') return
+                    var mod_dct = {}
+                    mod_dct.t = mod.type
+                    if (mod.type == 0) {// 给定代码
+                        mod_dct.s = mod.show
+                        var text = mod.mirror.getValue(), text_cache = mod.text_cache
+                        if (mod.edit_display) {
+                            text_cache = text
+                            text = mod.text_cache
+                        }
+                        mod_dct.c = text
+                        if (!mod.show && text_cache) {
+                            mod_dct.d = text_cache
+                        }
+                    } else {// 代码填空
+                        mod_dct.i = mod.input_indent.value * 1
+                    }
+                    res.push(mod_dct)
+                })
+                json_output.innerText = JSON.stringify(res)
+                preview()
+            })
+            document.getElementById('json_to_module').addEventListener('click', function () {
+                var pool = JSON.parse(json_output.innerText)
+                module_pool.innerHTML = ''
+                pool.forEach(function (mod_dct) {
+                    add_block(mod_dct.t, mod_dct)
+                })
+                preview()
+            })
+        }
+
+        // 批量切换自动换行
+        {
+            document.getElementById('codemirror_linewrap').addEventListener('click', function (e) {
+                var self = e.path[0]
+                e.stopPropagation();
+                var tmp = (CODEMIRROR_SETUP.lineWrapping = !CODEMIRROR_SETUP.lineWrapping)
+                module_pool.forEach(function (mod) {
+                    mod.mirror.setOption('lineWrapping', tmp)
+                })
+                preview_user.setOption('lineWrapping', tmp)
+                preview_code.setOption('lineWrapping', tmp)
+                self.innerHTML = '自动换行: ' + (tmp ? '开' : '关')
+            })
+        }
+    </script>
+</body>
+
+</html>
