@@ -95,6 +95,14 @@
 
 <body style='background: #eee'>
     <div class='container' style='background: white'>
+        <div class='row' style='background-color: var(--dark); height:40px'>
+            <div class='col-sm-12'>
+                <a class="navbar-brand" href="https://github.com/YukkuriC/django_fillin_oj" target='_blank'>
+                    <span style='color:#4585b5'>Py</span><span style='color:#ffd545'>Fillin</span>
+                    <span style='color:white'>OJ 出题工具</span>
+                </a>
+            </div>
+        </div>
         <br>
         <div class='row'>
             <div class="col-sm-2 dropdown">
@@ -214,7 +222,7 @@
         // 给定块
         function add_block(type, obj = null) {
             var pool = document.createElement('div')
-            pool.className = 'col-xs-12 module'
+            pool.className = 'col-sm-12 module'
 
             // 属性
             {
