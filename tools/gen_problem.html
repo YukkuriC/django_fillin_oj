@@ -83,6 +83,7 @@
 
         #json_output {
             overflow-y: auto;
+            overflow-x: hidden;
             white-space: pre-wrap;
             max-height: 40em;
             word-wrap: break-word;
@@ -129,6 +130,9 @@
                     </li>
                 </ul>
             </div>
+            <div class="col-sm-2">
+                <button id='preview_problem' class='btn btn-info form-control'>预览</button>
+            </div>
             <!-- <div class="col-sm-2 dropdown">
                 <a href="#" class="btn btn-secondary form-control dropdown-toggle" data-toggle="dropdown">设置</a>
                 <ul class="dropdown-menu">
@@ -139,7 +143,7 @@
             </div> -->
         </div>
         <br>
-        <div class='row' id='fold_panels'>
+        <div class='row'>
             <div class='col-sm-6 smooth'>
                 <h3>代码区域</h3>
                 <div id="module_pool"></div>
@@ -150,6 +154,19 @@
             </div>
         </div>
         <br>
+    </div>
+
+    <div class='container' style='background: white; margin-top: 20px;'>
+        <div class='row'>
+            <div class='col-sm-6'>
+                <h3>组装代码</h3>
+                <textarea id='preview_code' style="display:none"></textarea>
+            </div>
+            <div class='col-sm-6'>
+                <h3>用户端显示</h3>
+                <textarea id='preview_user' style="display:none"></textarea>
+            </div>
+        </div>
     </div>
 
     <!-- 各种功能辅助 -->
@@ -266,6 +283,7 @@
                     input_indent.max = 10
                     input_indent.step = 1
                     input_indent.value = obj ? obj.indent : 0
+                    pool.style.paddingLeft = (input_indent.value * CODEMIRROR_SETUP.indentUnit) + 'ch'
                     input_indent.addEventListener('change', function () {
                         input_indent.value = Math.max(0, Math.min(10, input_indent.value))
                         pool.style.paddingLeft = (input_indent.value * CODEMIRROR_SETUP.indentUnit) + 'ch'
@@ -312,6 +330,7 @@
                 var file_reader = new FileReader()
                 file_reader.addEventListener('load', () => {
                     json_output.innerText = file_reader.result
+                    document.getElementById('json_to_module').click()
                 })
                 file_reader.readAsText(upload_helper.files[0])
             })
@@ -321,6 +340,35 @@
                 save_helper.click()
             })
         }
+
+        // 预览功能
+        {
+            var preview_code = CodeMirror.fromTextArea(document.getElementById('preview_code'), CODEMIRROR_SETUP);
+            var preview_user = CodeMirror.fromTextArea(document.getElementById('preview_user'), CODEMIRROR_SETUP);
+            var opt = (preview_code.options = preview_user.options)
+            opt.indentUnit = 4
+            opt.readOnly = true
+
+            function preview() {
+                var pool = JSON.parse(json_output.innerText)
+                var tmp1 = [], tmp2 = []
+                pool.forEach(function (mod) {
+                    if (mod.type == 'struct') {
+                        tmp1.push(mod.code)
+                        if (mod.show) tmp2.push(mod.code)
+                        else if (mod.display) tmp2.push(mod.display)
+                    }
+                    else {
+                        var text = '\t'.repeat(mod.indent) + '### 填空区域 ###'
+                        tmp1.push(text)
+                        tmp2.push(text)
+                    }
+                })
+                preview_code.setValue(tmp1.join('\n'))
+                preview_user.setValue(tmp2.join('\n'))
+            }
+        }
+
 
         // 模块与json转换
         {
@@ -347,6 +395,7 @@
                     res.push(mod_dct)
                 })
                 json_output.innerText = JSON.stringify(res)
+                preview()
             })
             document.getElementById('json_to_module').addEventListener('click', function () {
                 var pool = JSON.parse(json_output.innerText)
@@ -354,6 +403,7 @@
                 pool.forEach(function (mod) {
                     add_block(mod.type, mod)
                 })
+                preview()
             })
         }
 
