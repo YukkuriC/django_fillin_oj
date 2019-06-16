@@ -66,8 +66,16 @@
             padding: 5px 0px;
         }
 
+        .module:hover>.toolbar {
+            max-height: 30px;
+            opacity: 1;
+        }
+
         .toolbar {
             font-size: 0.5em;
+            opacity: 0;
+            max-height: 0px;
+            transition: 0.3s all;
         }
 
         #json_output {
