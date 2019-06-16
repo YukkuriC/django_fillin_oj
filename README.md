@@ -10,31 +10,6 @@
     * 昵称+[Gravatar](https://www.gravatar.com)头像
 
 # TODO
-## 模型
-
-### 题目Problem
-名称|格式|需求
--|-|-
-题目描述|文本或JSON|对题目需求的描述、范例输入输出等
-代码结构|JSON|定义填空题每空的位置、缩进等<br>完全自由编写的题目留空
-
-### 测试点TestCase
-名称|格式|需求
--|-|-
-题目|外键|测试点对应的题目
-编号|int或str|该测试点名称
-时间限制|float|测试点最大用时
-输入|文本|1. stdin<br>2. 序列化的python对象
-输出|文本|1. stdout<br>2. 序列化的python对象<br>3. 序列化的判题函数
-
-### 用户提交Submission
-名称|格式|需求
--|-|-
-题目|外键|提交对应的题目
-提交时间|datetime|提交发起时间
-提交结构|JSON|前端组装的填空内容
-状态|int|Running/Accepted/xxxError
-细节|JSON|(若通过)总用时<br>(若未通过)错误测试点的细节
 
 ## 基础设施
 
@@ -70,6 +45,9 @@
 1. 综合助教人工与所有提交统计的智能提示
 
 # CHANGELOG
+## 20190616
+* 创建了必需的ORM模型
+
 ## 20190615
 * 自[代码竞技场](https://github.com/YukkuriC/django_ai_arena)移植用户系统
 * 创建文档
