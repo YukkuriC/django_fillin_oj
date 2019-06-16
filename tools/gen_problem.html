@@ -219,10 +219,10 @@
             // 属性
             {
                 pool.type = type
-                if (type == 'struct') {
-                    pool.show = obj ? obj.show : true
+                if (type == 0) {
+                    pool.show = obj ? obj.s : true
                     pool.edit_display = false
-                    pool.text_cache = obj ? (obj.display || '') : ''
+                    pool.text_cache = obj ? (obj.d || '') : ''
                 }
             }
 
@@ -236,7 +236,7 @@
             toolbar_right.className = 'ml-auto'
             toolbar.appendChild(toolbar_left)
             toolbar.appendChild(toolbar_right)
-            if (type == 'struct') {// 代码块
+            if (type == 0) {// 代码块
                 {// 设置可见性
                     var btn_show = document.createElement('button')
                     btn_show.className = 'btn-xs btn-info'
@@ -279,7 +279,7 @@
                     input_indent.min = 0
                     input_indent.max = 10
                     input_indent.step = 1
-                    input_indent.value = obj ? obj.indent : 0
+                    input_indent.value = obj ? obj.i : 0
                     pool.style.paddingLeft = (input_indent.value * CODEMIRROR_SETUP.indentUnit) + 'ch'
                     input_indent.addEventListener('change', function () {
                         input_indent.value = Math.max(0, Math.min(10, input_indent.value))
@@ -304,15 +304,16 @@
             pool.appendChild(text)
             pool.mirror = CodeMirror.fromTextArea(text, CODEMIRROR_SETUP);
             module_pool.appendChild(pool)
-            if (type == 'struct') {
-                if (obj && obj.code) pool.mirror.setValue(obj.code)
+            console.log(type)
+            if (type == 0) {
+                if (obj && obj.c) pool.mirror.setValue(obj.c)
             } else {
                 pool.mirror.setValue('# 填空区域')
                 pool.mirror.setOption('readOnly', true)
             }
         }
-        document.getElementById('add_struct').addEventListener('click', function () { add_block('struct') })
-        document.getElementById('add_fillin').addEventListener('click', function () { add_block('fillin') })
+        document.getElementById('add_struct').addEventListener('click', function () { add_block(0) })
+        document.getElementById('add_fillin').addEventListener('click', function () { add_block(1) })
     </script>
 
     <!-- 前端按钮 -->
@@ -348,14 +349,14 @@
             function preview() {
                 var pool = JSON.parse(json_output.innerText)
                 var tmp1 = [], tmp2 = []
-                pool.forEach(function (mod) {
-                    if (mod.type == 'struct') {
-                        tmp1.push(mod.code)
-                        if (mod.show) tmp2.push(mod.code)
-                        else if (mod.display) tmp2.push(mod.display)
+                pool.forEach(function (mod_dct) {
+                    if (mod_dct.t == 0) {
+                        tmp1.push(mod_dct.c)
+                        if (mod_dct.s) tmp2.push(mod_dct.c)
+                        else if (mod_dct.d) tmp2.push(mod_dct.d)
                     }
                     else {
-                        var text = '\t'.repeat(mod.indent) + '### 填空区域 ###'
+                        var text = '\t'.repeat(mod_dct.i) + '### 填空区域 ###'
                         tmp1.push(text)
                         tmp2.push(text)
                     }
@@ -372,20 +373,20 @@
                 module_pool.forEach(function (mod) {
                     if (typeof mod.mirror == 'undefined') return
                     var mod_dct = {}
-                    mod_dct.type = mod.type
-                    if (mod.type == 'struct') {// 给定代码
-                        mod_dct.show = mod.show
+                    mod_dct.t = mod.type
+                    if (mod.type == 0) {// 给定代码
+                        mod_dct.s = mod.show
                         var text = mod.mirror.getValue(), text_cache = mod.text_cache
                         if (mod.edit_display) {
                             text_cache = text
                             text = mod.text_cache
                         }
-                        mod_dct.code = text
+                        mod_dct.c = text
                         if (!mod.show && text_cache) {
-                            mod_dct.display = text_cache
+                            mod_dct.d = text_cache
                         }
                     } else {// 代码填空
-                        mod_dct.indent = mod.input_indent.value * 1
+                        mod_dct.i = mod.input_indent.value * 1
                     }
                     res.push(mod_dct)
                 })
@@ -395,8 +396,8 @@
             document.getElementById('json_to_module').addEventListener('click', function () {
                 var pool = JSON.parse(json_output.innerText)
                 module_pool.innerHTML = ''
-                pool.forEach(function (mod) {
-                    add_block(mod.type, mod)
+                pool.forEach(function (mod_dct) {
+                    add_block(mod_dct.t, mod_dct)
                 })
                 preview()
             })
