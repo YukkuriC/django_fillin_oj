@@ -1,5 +1,5 @@
 # 题目结构Problem.struct
-```json
+```javascript
 [
     // 题目代码结构(可见)
     {
@@ -12,7 +12,6 @@
         "type": "struct",
         "show": false,
         "code": "\tres=a+b",
-        "display": ""
     },
     // 题目代码结构(显示指定内容)
     {
@@ -20,6 +19,11 @@
         "show": false,
         "code": "\treturn res",
         "display": "\t# 显示内容"
+    },
+    // 填空区域
+    {
+        "type": "fillin",
+        "indent": 0
     }
 ]
 ```
