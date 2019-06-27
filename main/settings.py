@@ -89,7 +89,7 @@ if 'original':
         DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.mysql',
-                'NAME': 'arena',
+                'NAME': 'pyfillin_oj',
                 'USER': os.environ['MYSQL_USER'],
                 'PASSWORD': os.environ['MYSQL_PASSWD'],
                 'HOST': os.environ['MYSQL_HOST'],
