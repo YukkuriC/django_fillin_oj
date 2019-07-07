@@ -247,6 +247,7 @@
             if (type == 0) {// 代码块
                 {// 设置可见性
                     var btn_show = document.createElement('button')
+                    toolbar.btn_show = btn_show
                     btn_show.className = 'btn-xs btn-info'
                     toolbar.append(btn_show)
                     btn_show.update = function () {
@@ -262,6 +263,7 @@
                 }
                 {// 设置不可见时显示内容
                     var btn_mode = document.createElement('button')
+                    toolbar.btn_mode = btn_mode
                     btn_mode.className = 'btn-xs btn-info'
                     toolbar.append(btn_mode)
                     btn_mode.update = function () {
